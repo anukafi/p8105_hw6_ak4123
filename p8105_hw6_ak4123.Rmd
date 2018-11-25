@@ -147,7 +147,7 @@ Propose a regression model for birthweight. Describe your modeling process and s
 model_bwt = 
   lm(bwt ~ delwt+fincome+menarche+mheight+momage+mrace+ pnumlbw+pnumsga+ppbmi+ppwt, data = birthweight)
 ```
-This model is based on maternal factors that could affect birthweight. 
+This model is based on maternal factors that could affect birthweight. The plot of the model residuals against fitted values is below.
 ```{r}
 birthweight %>% 
   modelr::add_residuals(model_bwt) %>% 
@@ -159,3 +159,4 @@ birthweight %>%
     y = "Prediction",
     title = "Model Residuals Against Fitted Values")
 ```
+
