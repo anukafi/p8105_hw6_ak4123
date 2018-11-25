@@ -111,7 +111,7 @@ glm_homicides %>%
 ```
 
 ##QUESTION 2
-
+Load and clean the data for regression analysis:
 ```{r}
 birthweight = read.csv("./data/birthweight.csv") %>% 
   mutate(
@@ -141,3 +141,5 @@ birthweight = read.csv("./data/birthweight.csv") %>%
   )
 missing_data = sum(is.na(birthweight))
 ```
+
+Propose a regression model for birthweight. Describe your modeling process and show a plot of model residuals against fitted values – use add_predictions and add_residuals in making this plot.
