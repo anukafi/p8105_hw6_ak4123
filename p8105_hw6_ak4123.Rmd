@@ -6,6 +6,7 @@ output: github_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(modelr)
 set.seed(1)
 ```
 
@@ -161,12 +162,22 @@ birthweight %>%
 ```
 
 Compare your model to two others:
-
 One using length at birth and gestational age as predictors (main effects only)
 One using head circumference, length, sex, and all interactions (including the three-way interaction) between these
-Make this comparison in terms of the cross-validated prediction error
-
 ```{r}
 model_A = lm(bwt ~ blength + gaweeks, data = birthweight)
 model_B = lm(bwt ~ bhead + blength + babysex + bhead*babysex + blength+babysex + bhead*blength*babysex + bhead*blength, data = birthweight)
+```
+Make this comparison in terms of the cross-validated prediction error
+```{r}
+cv_bwt = 
+  crossv_mc(birthweight, 100)
+cv_bwt = 
+  cv_bwt %>% 
+  mutate(model_bwt = map(train, ~lm(bwt ~ delwt + gaweeks + ppwt + smoken, data = birthweight)),
+         model_A = map(train, ~lm(bwt ~ blength + gaweeks, data = birthweight)),
+         model_B = map(train, ~lm(bwt ~ bhead + blength + babysex + bhead*babysex + blength+babysex + bhead*blength*babysex + bhead*blength, data = birthweight))) %>% 
+  mutate(rmse_bwt = map2_dbl(model_bwt, test, ~rmse(model = .x, data = .y)),
+         rmse_A = map2_dbl(model_A, test, ~rmse(model = .x, data = .y)),
+         rmse_B = map2_dbl(model_B, test, ~rmse(model = .x, data = .y)))
 ```
