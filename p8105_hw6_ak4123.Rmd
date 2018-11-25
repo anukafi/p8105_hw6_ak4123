@@ -148,3 +148,14 @@ model_bwt =
   lm(bwt ~ delwt+fincome+menarche+mheight+momage+mrace+ pnumlbw+pnumsga+ppbmi+ppwt, data = birthweight)
 ```
 This model is based on maternal factors that could affect birthweight. 
+```{r}
+birthweight %>% 
+  modelr::add_residuals(model_bwt) %>% 
+  modelr::add_predictions(model_bwt) %>% 
+  ggplot(aes(x = pred, y = resid)) +
+    geom_point() +
+  labs(
+    x = "Risiduals",
+    y = "Prediction",
+    title = "Model Residuals Against Fitted Values")
+```
