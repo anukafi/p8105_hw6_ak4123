@@ -41,10 +41,10 @@ logistic %>%
   broom::tidy() %>% 
   janitor::clean_names() %>% 
   mutate(OR = exp(estimate),
-         lower_cl = exp(estimate - (1.96 * std_error)),
-         upper_cl = exp(estimate + (1.96 * std_error))) %>%
+         lower_ci = exp(estimate - (1.96 * std_error)),
+         upper_ci = exp(estimate + (1.96 * std_error))) %>%
   filter(term == "victim_raceNon-White") %>% 
-  select(OR, lower_cl, upper_cl) %>% 
+  select(OR, lower_ci, upper_ci) %>% 
   knitr::kable()
 ```
 
@@ -63,34 +63,49 @@ logistic = logistic %>%
   unnest() %>% 
   janitor::clean_names() %>% 
   mutate(OR = exp(estimate),
-         lower_cl = exp(estimate - (1.96 * std_error)),
-         upper_cl = exp(estimate + (1.96 * std_error))) %>% 
+         lower_ci = exp(estimate - (1.96 * std_error)),
+         upper_ci = exp(estimate + (1.96 * std_error))) %>% 
   filter(term == "victim_raceNon-White") %>%
-  select(city_state, OR, lower_cl, upper_cl) 
+  select(city_state, OR, lower_ci, upper_ci) 
   
 logistic %>% 
   knitr::kable()
 ```
 
 ```{r}
-nested_glm =
+nest_glm_res =
   homicides %>% 
   group_by(city_state) %>% 
   nest() %>% 
-  mutate(reg_city_state = map(data, ~lm(resolution ~ victim_age + victim_sex + victim_race, data = .x)),
-         reg_city_state = map(reg_city_state, broom::tidy)) %>% 
+  mutate(models = map(data, ~lm(resolution ~ victim_age + victim_sex + victim_race, data = .x)),
+         models = map(models, broom::tidy)) %>% 
   select(-data)
 
-nested_glm = nested_glm %>% 
+glm_homicides = nest_glm_res %>% 
   unnest() %>% 
   janitor::clean_names() %>% 
   mutate(OR = exp(estimate),
-         lower_95_limit = exp(estimate - (1.96 * std_error)),
-         upper_95_limit = exp(estimate + (1.96 * std_error))
+         lower_ci = exp(estimate - (1.96 * std_error)),
+         upper_ci = exp(estimate + (1.96 * std_error))
   ) %>% 
-  filter(term == "victim_racenon-white") %>%
-  select(city_state, OR, lower_95_limit, upper_95_limit)
-
-nested_glm %>% 
+  filter(term == "victim_raceNon-White") %>%
+  select(city_state, OR, lower_ci, upper_ci) 
+  
+glm_homicides %>% 
   knitr::kable()
+```
+
+```{r}
+glm_homicides %>% 
+  mutate(city_state = forcats::fct_inorder(city_state)) %>% 
+  ggplot(aes(x = city_state, y = OR)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = lower_ci, ymax = upper_ci)) +
+  labs(
+    x = "City, State",
+    y = "ORs",
+    title = "ORs and 95% CIs for Solved Cases Comparing Non-whites to Whites"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, size = 5)) 
 ```
