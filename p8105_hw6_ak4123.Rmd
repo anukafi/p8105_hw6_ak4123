@@ -58,6 +58,7 @@ nested =
   mutate(models = map(data, ~lm(resolution ~ victim_age + victim_sex + victim_race, data = .x)),
          models = map(models, broom::tidy)) %>% 
   select(-data)
+
 final_homicides = nested %>% 
   unnest() %>% 
   janitor::clean_names() %>% 
