@@ -181,3 +181,16 @@ cv_bwt =
          rmse_A = map2_dbl(model_A, test, ~rmse(model = .x, data = .y)),
          rmse_B = map2_dbl(model_B, test, ~rmse(model = .x, data = .y)))
 ```
+
+Plot of model comparisons
+```{r}
+cv_bwt %>% 
+  select(starts_with("rmse")) %>% 
+  gather(key = model, value = rmse) %>% 
+  mutate(model = str_replace(model, "rmse_", ""),
+         model = fct_inorder(model)) %>% 
+  ggplot(aes(x = model, y = rmse)) + geom_violin() + 
+  labs(title = "Violin plots of RMSE", 
+       x = "Model", 
+       y = "RMSE")
+```
