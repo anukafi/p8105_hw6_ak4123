@@ -160,3 +160,13 @@ birthweight %>%
     title = "Model Residuals Against Fitted Values")
 ```
 
+Compare your model to two others:
+
+One using length at birth and gestational age as predictors (main effects only)
+One using head circumference, length, sex, and all interactions (including the three-way interaction) between these
+Make this comparison in terms of the cross-validated prediction error
+
+```{r}
+model_A = lm(bwt ~ blength + gaweeks, data = birthweight)
+model_B = lm(bwt ~ bhead + blength + babysex + bhead*babysex + blength+babysex + bhead*blength*babysex + bhead*blength, data = birthweight)
+```
